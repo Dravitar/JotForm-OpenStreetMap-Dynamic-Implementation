@@ -3,25 +3,114 @@
 <head>
   <meta charset="utf-8" />
   <title>Dynamic OSM Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Jotform Custom Widget API -->
+  <script src="https://cdn.jotfor.ms/s/umd/latest/for-custom-widgets.js"></script>
   <style>
-    #map { height: 400px; width: 100% }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #map {
+      height: 400px;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
 <div id="map"></div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  const params = new URLSearchParams(window.location.search);
+let map = null;
+let marker = null;
 
-  document.body.innerHTML += `
-    <pre>
-URL: ${window.location.href}
-lat: ${params.get("lat")}
-lon: ${params.get("lon")}
-    </pre>
-  `;
+// -------------------------
+// MAP
+// -------------------------
+
+function updateMap(lat, lon) {
+  lat = parseFloat(lat);
+  lon = parseFloat(lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return;
+  }
+  if (!map) {
+    map = L.map("map").setView([lat, lon], 16);
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution: "&copy; OpenStreetMap contributors"
+      }
+    ).addTo(map);
+  } else {
+    map.setView([lat, lon], 16);
+  }
+  if (marker) {
+    marker.setLatLng([lat, lon]);
+  } else {
+    marker = L.marker([lat, lon])
+      .addTo(map);
+  }
+  marker
+    .bindPopup(`Location: ${lat}, ${lon}`)
+    .openPopup();
+}
+  
+// -------------------------
+// JOTFORM
+// -------------------------
+
+JFCustomWidget.subscribe("ready", function() {
+
+  const LAT_FIELD = "input_20";
+  const LONG_FIELD = "input_21";
+
+  function getCoordinates() {
+
+    JFCustomWidget.getFieldsValueByName(
+      [LAT_FIELD, LONG_FIELD],
+      function(result) {
+
+        console.log("Jotform field values:", result);
+
+        /*
+         * Jotform returns the values in result.data.
+         * The exact object structure can be inspected
+         * in the browser console if necessary.
+         */
+
+        const data = result.data;
+
+        const lat = data[LAT_FIELD];
+        const lon = data[LONG_FIELD];
+
+        updateMap(lat, lon);
+      }
+    );
+  }
+
+  // Get the values that already exist when widget loads
+  getCoordinates();
+
+  // Update map if either field changes
+  JFCustomWidget.listenFromField(
+    LAT_FIELD,
+    "change",
+    getCoordinates
+  );
+
+  JFCustomWidget.listenFromField(
+    LONG_FIELD,
+    "change",
+    getCoordinates
+  );
+});
+
 </script>
 </body>
 </html>
