@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset0"utf-8" />
+  <title>Dynamic OSM Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 400px; width: 100% }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Ger coordinates from URL parameters
+  const params = new URLSearchParams(window.location.search);
+  const lat = parseFloat(params.get("lat")) || 0;
+  const lon = parseFloar(params.get("lon")) || 0;
+
+  // Initialize map
+  const map = L.map("map").setView([lat, lon], 13);
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Add marker
+  L.marker([lat,lon]).addTo(map)
+    .bindPopup(`Location: ${lat}, ${lon}`)
+    .openPopup();
+</script>
+</body>
+</html>
