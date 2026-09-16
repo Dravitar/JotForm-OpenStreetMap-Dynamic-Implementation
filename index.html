@@ -13,23 +13,15 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  // Ger coordinates from URL parameters
   const params = new URLSearchParams(window.location.search);
-  const lat = parseFloat(params.get("lat")) || 0;
-  const lon = parseFloat(params.get("lon")) || 0;
 
-  // Initialize map
-  const map = L.map("map").setView([lat, lon], 13);
-
-  // Add OpenStreetMap tiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  // Add marker
-  L.marker([lat,lon]).addTo(map)
-    .bindPopup(`Location: ${lat}, ${lon}`)
-    .openPopup();
+  document.body.innerHTML += `
+    <pre>
+URL: ${window.location.href}
+lat: ${params.get("lat")}
+lon: ${params.get("lon")}
+    </pre>
+  `;
 </script>
 </body>
 </html>
