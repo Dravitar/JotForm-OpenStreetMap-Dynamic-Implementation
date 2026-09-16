@@ -16,7 +16,7 @@
   // Ger coordinates from URL parameters
   const params = new URLSearchParams(window.location.search);
   const lat = parseFloat(params.get("lat")) || 0;
-  const lon = parseFloar(params.get("lon")) || 0;
+  const lon = parseFloat(params.get("lon")) || 0;
 
   // Initialize map
   const map = L.map("map").setView([lat, lon], 13);
